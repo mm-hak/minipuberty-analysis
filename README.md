@@ -1,6 +1,6 @@
 # Minipuberty analysis
 
-This repository accompanies the manuscript *Perinatal antibiotic exposure may have an impact on male infant testosterone levels during the critical period of intense growth* (short title: *Perinatal antibiotics and infant testosterone*).
+This repository accompanies the manuscript *Perinatal antibiotic exposure may have an impact on male infant testosterone levels during the critical period of intense growth
 
 The repository contains R scripts and Quarto documents used to process the study data, run the analyses, and generate manuscript figures. The study examines associations between perinatal antibiotic exposure and testosterone levels in male infants during minipuberty. Related analyses examine early infant growth, other hormone measures, and the gut microbiota.
 
