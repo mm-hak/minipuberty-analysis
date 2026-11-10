@@ -1,0 +1,145 @@
+---
+title: "Stage 3: Genus-level microbiome analysis"
+format:
+  html:
+    toc: true
+    number-sections: true
+    self-contained: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+required <- c("readr", "dplyr", "ggplot2", "DT", "knitr")
+missing <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing)) stop("Missing report package(s): ", paste(missing, collapse = ", "))
+taxa_level <- "genus"
+root <- normalizePath(file.path("..", "..", "02_analysis", "output", "stage3", taxa_level), mustWork = TRUE)
+read_result <- function(name) {
+  path <- file.path(root, "tables", name)
+  if (!file.exists(path)) stop("Required result missing: ", path)
+  readr::read_csv(path, show_col_types = FALSE)
+}
+show_table <- function(name, caption) DT::datatable(read_result(name), caption = caption,
+  rownames = FALSE, filter = "top", options = list(pageLength = 10, scrollX = TRUE))
+source(file.path("..", "R", "03_differential_abundance_plot.R"))
+```
+
+# Scope
+
+This report presents the genus-level microbiome analyses produced by
+`02_analysis/07_stage3_genus.R`. It reads saved outputs and does not refit models.
+
+# Shannon diversity distribution
+
+```{r}
+knitr::include_graphics(file.path(root, "figures", "shannon_distribution.png"))
+```
+
+# Community composition
+
+```{r}
+knitr::include_graphics(file.path(root, "figures", "community_composition_top_taxa.png"))
+```
+
+# Alpha diversity
+
+Shannon diversity is evaluated against categorical variables with pairwise
+Wilcoxon tests and against continuous variables with Spearman correlations.
+
+::: panel-tabset
+## Categorical variables
+
+```{r}
+show_table("alpha_categorical.csv", "Shannon diversity: categorical variables")
+```
+
+## Continuous variables
+
+```{r}
+show_table("alpha_continuous.csv", "Shannon diversity: continuous variables")
+```
+
+## Interaction models
+
+```{r}
+show_table("alpha_interactions.csv", "Shannon-diversity interaction models")
+```
+:::
+
+# Beta diversity
+
+Bray–Curtis uses relative abundance. Aitchison distance uses Euclidean distance
+on the CLR assay. PERMANOVA uses 999 permutations, as in the original documents.
+
+::: panel-tabset
+## Bray–Curtis
+
+```{r}
+show_table("beta_bray_univariate.csv", "Univariate PERMANOVA/PERMDISP: Bray–Curtis")
+```
+
+## Aitchison
+
+```{r}
+show_table("beta_aitchison_univariate.csv", "Univariate PERMANOVA/PERMDISP: Aitchison")
+```
+
+## Bray–Curtis interactions
+
+```{r}
+show_table("beta_bray_interactions.csv", "Interaction PERMANOVA/PERMDISP: Bray–Curtis")
+```
+
+## Aitchison interactions
+
+```{r}
+show_table("beta_aitchison_interactions.csv", "Interaction PERMANOVA/PERMDISP: Aitchison")
+```
+:::
+
+# Differential abundance
+
+
+
+## Significant relative-abundance coefficients
+
+
+
+```{r}
+#| fig-width: 10
+#| fig-height: 5
+show_significant_relative_da(
+  read_result("differential_abundance_relative.csv"),
+  read_result("differential_abundance_interactions_relative.csv"),
+  taxa_level
+)
+```
+
+::: panel-tabset
+## Relative abundance
+
+```{r}
+show_table("differential_abundance_relative.csv", "MaAsLin results: relative abundance")
+```
+
+## CLR
+
+```{r}
+show_table("differential_abundance_clr.csv", "MaAsLin results: CLR")
+```
+
+## Relative-abundance interactions
+
+```{r}
+show_table("differential_abundance_interactions_relative.csv", "MaAsLin interaction results: relative abundance")
+```
+
+## CLR interactions
+
+```{r}
+show_table("differential_abundance_interactions_clr.csv", "MaAsLin interaction results: CLR")
+```
+:::

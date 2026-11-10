@@ -1,0 +1,219 @@
+---
+title: "Stage 1: Gender-stratified growth analysis"
+format:
+  html:
+    toc: true
+    number-sections: true
+    code-fold: true
+    self-contained: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+required_packages <- c("readr", "dplyr", "DT", "knitr")
+missing_packages <- required_packages[
+  !vapply(required_packages, requireNamespace, logical(1), quietly = TRUE)
+]
+if (length(missing_packages) > 0) {
+  stop("Missing report package(s): ", paste(missing_packages, collapse = ", "))
+}
+
+analysis_root <- normalizePath(
+  file.path("..", "..", "02_analysis", "output", "stage1_gender"),
+  mustWork = TRUE
+)
+table_path <- function(name) file.path(analysis_root, "tables", name)
+figure_path <- function(name) file.path(analysis_root, "figures", name)
+
+read_result <- function(name) {
+  path <- table_path(name)
+  if (!file.exists(path)) stop("Required analysis table not found: ", path)
+  readr::read_csv(path, show_col_types = FALSE)
+}
+
+show_table <- function(x, caption) {
+  DT::datatable(
+    x,
+    caption = caption,
+    rownames = FALSE,
+    filter = "top",
+    options = list(pageLength = 10, scrollX = TRUE)
+  )
+}
+
+show_figure <- function(name) {
+  path <- figure_path(name)
+  if (!file.exists(path)) stop("Required analysis figure not found: ", path)
+  knitr::include_graphics(path)
+}
+```
+
+# Scope
+
+This stage examines growth patterns in the larger infant dataset, including
+both male and female infants. It evaluates associations between early-life
+exposures, maternal and birth characteristics, gender, and growth during the
+0–3- and 3–6-month periods.
+
+The statistical analyses are performed by `02_analysis/01_stage1_gender.R`.
+This report reads the saved tables and figures; it does not refit models.
+
+
+# Outcome distributions
+
+The original workflow retained untransformed outcomes for the statistical
+analyses after comparing original and log-transformed distributions.
+
+```{r}
+#| fig-cap: "Original and log-transformed growth outcome distributions."
+#| out-width: "90%"
+show_figure("outcome_distributions_original_and_log.png")
+```
+
+# Group distributions
+
+## Overall
+
+```{r}
+class_distribution <- read_result("class_distribution.csv")
+show_table(class_distribution, "Categorical-variable distributions")
+```
+
+## By gender
+
+```{r}
+class_distribution_gender <- read_result("class_distribution_by_gender.csv")
+show_table(class_distribution_gender, "Categorical-variable distributions by gender")
+```
+
+# Mann–Whitney U tests
+
+The categorical predictors were tested separately within each time period.
+Benjamini–Hochberg adjustment was applied within each saved time-period table.
+
+::: panel-tabset
+## 0–3 months
+
+```{r}
+wilcoxon_03 <- read_result("wilcoxon_0.3M.csv")
+show_table(wilcoxon_03, "Mann–Whitney U tests: 0–3 months")
+```
+
+```{r}
+#| fig-cap: "FDR-significant comparisons, or the largest effect sizes when none were FDR-significant: 0–3 months."
+show_figure("wilcoxon_selected_0.3M.png")
+```
+
+## 3–6 months
+
+```{r}
+wilcoxon_36 <- read_result("wilcoxon_3.6M.csv")
+show_table(wilcoxon_36, "Mann–Whitney U tests: 3–6 months")
+```
+
+```{r}
+#| fig-cap: "FDR-significant comparisons, or the largest effect sizes when none were FDR-significant: 3–6 months."
+show_figure("wilcoxon_selected_3.6M.png")
+```
+:::
+
+# ART-ANOVA
+
+Aligned Rank Transform ANOVA was used to evaluate categorical predictor,
+gender, and predictor-by-gender effects. Benjamini–Hochberg adjustment was
+performed separately within each time period, matching the original workflow.
+
+::: panel-tabset
+## 0–3 months
+
+```{r}
+art_03 <- read_result("art_anova_0.3M.csv")
+show_table(art_03, "ART-ANOVA: 0–3 months")
+```
+
+## 3–6 months
+
+```{r}
+art_36 <- read_result("art_anova_3.6M.csv")
+show_table(art_36, "ART-ANOVA: 3–6 months")
+```
+:::
+
+# Continuous-predictor linear models
+
+Simple linear models evaluate each continuous predictor separately for each
+growth outcome. The tables include the model estimate, standard error,
+test statistic, R-squared value, raw p-value, and BH-adjusted p-value.
+
+::: panel-tabset
+## 0–3 months
+
+```{r}
+linear_03 <- read_result("linear_models_0.3M.csv")
+show_table(linear_03, "Linear models: 0–3 months")
+```
+
+```{r}
+#| fig-cap: "Selected continuous-predictor model estimates: 0–3 months."
+show_figure("linear_model_estimates_0.3M.png")
+```
+
+## 3–6 months
+
+```{r}
+linear_36 <- read_result("linear_models_3.6M.csv")
+show_table(linear_36, "Linear models: 3–6 months")
+```
+
+```{r}
+#| fig-cap: "Selected continuous-predictor model estimates: 3–6 months."
+show_figure("linear_model_estimates_3.6M.png")
+```
+:::
+
+# Continuous predictor × gender models
+
+These models test whether gender modifies the association between each
+continuous predictor and each growth outcome.
+
+::: panel-tabset
+## 0–3 months
+
+```{r}
+gender_03 <- read_result("linear_models_gender_0.3M.csv")
+show_table(gender_03, "Continuous predictor × gender models: 0–3 months")
+```
+
+```{r}
+#| fig-cap: "Selected predictor-by-gender interaction estimates: 0–3 months."
+show_figure("gender_interaction_estimates_0.3M.png")
+```
+
+## 3–6 months
+
+```{r}
+gender_36 <- read_result("linear_models_gender_3.6M.csv")
+show_table(gender_36, "Continuous predictor × gender models: 3–6 months")
+```
+
+```{r}
+#| fig-cap: "Selected predictor-by-gender interaction estimates: 3–6 months."
+show_figure("gender_interaction_estimates_3.6M.png")
+```
+:::
+
+# Saved diagnostic material
+
+The analysis stores four-panel linear-model diagnostic plots under:
+
+```text
+02_analysis/output/stage1_gender/diagnostics/
+```
+
+Model objects are saved under `models/`, complete result objects under
+`objects/`, publication-ready vector figures as PDF, and report previews as
+high-resolution PNG.

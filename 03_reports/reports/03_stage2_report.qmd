@@ -1,0 +1,102 @@
+---
+title: "Stage 2: Hormone analysis"
+format:
+  html:
+    toc: true
+    number-sections: true
+    self-contained: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+required <- c("readr", "DT", "knitr")
+missing <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing)) stop("Missing report package(s): ", paste(missing, collapse = ", "))
+root <- normalizePath(file.path("..", "..", "02_analysis", "output", "stage2"), mustWork = TRUE)
+read_table <- function(name) readr::read_csv(file.path(root, "tables", name), show_col_types = FALSE)
+show_table <- function(x, caption) DT::datatable(x, caption = caption, rownames = FALSE,
+  filter = "top", options = list(pageLength = 10, scrollX = TRUE))
+show_figure <- function(name) knitr::include_graphics(file.path(root, "figures", name))
+```
+
+# Scope
+
+This stage evaluates associations of exposures, maternal characteristics, and
+growth measures with infant hormone concentrations, followed by associations
+between log-transformed hormones and growth. The analysis is performed by
+`02_analysis/03_stage2.R`.
+
+# Hormone distributions
+
+::: panel-tabset
+## Original
+
+```{r}
+show_figure("hormone_distributions_original.png")
+```
+
+## Log-transformed
+
+```{r}
+show_figure("hormone_distributions_log.png")
+```
+:::
+
+# Categorical predictors and hormones
+
+```{r}
+show_table(read_table("wilcoxon_hormones.csv"), "Mann–Whitney U tests for log-transformed hormones")
+show_figure("wilcoxon_hormones_selected.png")
+```
+
+# Hormones versus continuous predictors
+
+```{r}
+show_table(read_table("linear_hormones_vs_predictors.csv"), "Hormones versus continuous predictors")
+show_figure("linear_hormones_vs_predictors_estimates.png")
+```
+
+# Growth versus hormones
+
+::: panel-tabset
+## 0–3 months
+
+```{r}
+show_table(read_table("linear_growth_vs_hormones_0.3M.csv"), "Growth versus hormones: 0–3 months")
+show_figure("linear_growth_vs_hormones_0.3M.png")
+```
+
+## 3–6 months
+
+```{r}
+show_table(read_table("linear_growth_vs_hormones_3.6M.csv"), "Growth versus hormones: 3–6 months")
+show_figure("linear_growth_vs_hormones_3.6M.png")
+```
+:::
+
+# Testosterone interaction models
+
+```{r}
+show_table(read_table("testosterone_interaction_models.csv"), "Pregnancy-antibiotic interaction models")
+```
+
+::: panel-tabset
+## Maternal pre-pregnancy BMI
+
+```{r}
+show_figure("testosterone_pregnancy_antibiotic_bmi.png")
+```
+
+## Maternal age
+
+```{r}
+show_figure("testosterone_pregnancy_antibiotic_maternal_age.png")
+```
+:::
+
+# Diagnostics
+
+Four-panel regression diagnostics are saved under `output/stage2/diagnostics/`.

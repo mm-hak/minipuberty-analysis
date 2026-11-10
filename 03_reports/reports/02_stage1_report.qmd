@@ -1,0 +1,95 @@
+---
+title: "Stage 1: Growth analysis"
+format:
+  html:
+    toc: true
+    number-sections: true
+    self-contained: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+required <- c("readr", "DT", "knitr")
+missing <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing)) stop("Missing report package(s): ", paste(missing, collapse = ", "))
+root <- normalizePath(file.path("..", "..", "02_analysis", "output", "stage1"), mustWork = TRUE)
+read_table <- function(name) readr::read_csv(file.path(root, "tables", name), show_col_types = FALSE)
+show_table <- function(x, caption) DT::datatable(x, caption = caption, rownames = FALSE,
+  filter = "top", options = list(pageLength = 10, scrollX = TRUE))
+show_figure <- function(name) knitr::include_graphics(file.path(root, "figures", name))
+```
+
+# Scope
+
+This stage examines associations between early-life exposures, maternal and
+birth characteristics, and growth during the 0–3- and 3–6-month periods. The
+analysis is performed by `02_analysis/02_stage1.R`; this report only reads its
+saved outputs. This report covers additional growth analyses in male infants with blood samples. Results from these analyses are not reported in the manuscript.
+
+# Outcome correlations
+
+::: panel-tabset
+## Growth velocity
+
+```{r}
+show_table(read_table("growth_velocity_correlations.csv"), "Growth-velocity correlations")
+```
+
+## Weight gain
+
+```{r}
+show_table(read_table("weight_gain_correlations.csv"), "Weight-gain correlations")
+```
+:::
+
+# Outcome distributions
+
+```{r}
+#| fig-cap: "Original and log-transformed growth outcomes."
+show_figure("outcome_distributions_original_and_log.png")
+```
+
+# Mann–Whitney U tests
+
+::: panel-tabset
+## 0–3 months
+
+```{r}
+show_table(read_table("wilcoxon_0.3M.csv"), "Mann–Whitney U tests: 0–3 months")
+show_figure("wilcoxon_selected_0.3M.png")
+```
+
+## 3–6 months
+
+```{r}
+show_table(read_table("wilcoxon_3.6M.csv"), "Mann–Whitney U tests: 3–6 months")
+show_figure("wilcoxon_selected_3.6M.png")
+```
+:::
+
+# Continuous-predictor linear models
+
+::: panel-tabset
+## 0–3 months
+
+```{r}
+show_table(read_table("linear_models_0.3M.csv"), "Linear models: 0–3 months")
+show_figure("linear_model_estimates_0.3M.png")
+```
+
+## 3–6 months
+
+```{r}
+show_table(read_table("linear_models_3.6M.csv"), "Linear models: 3–6 months")
+show_figure("linear_model_estimates_3.6M.png")
+```
+:::
+
+# Diagnostics and exploratory figures
+
+Complete regression diagnostics are saved under `output/stage1/diagnostics/`.
+Histograms, scatterplots, and variance-check boxplots are under
+`output/stage1/figures/`.
