@@ -10,7 +10,7 @@ project:
     - reports/04_stage3_species_report.qmd
     - reports/05_stage3_genus_report.qmd
     - reports/06_stage3_phylum_report.qmd
-    - reports/07_summary_report.qmd
+
 
 website:
   title: "Minipuberty analysis"
@@ -38,8 +38,7 @@ website:
             text: Genus level
           - href: reports/06_stage3_phylum_report.qmd
             text: Phylum level
-      - href: reports/07_summary_report.qmd
-        text: Workflow summary
+
 
 format:
   html:
