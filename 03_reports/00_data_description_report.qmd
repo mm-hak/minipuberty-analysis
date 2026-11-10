@@ -1,0 +1,186 @@
+---
+title: "Description of the analysis datasets"
+format:
+  html:
+    toc: true
+    number-sections: true
+    self-contained: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+required <- c("readr", "dplyr", "DT", "knitr")
+missing <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing)) {
+  stop("Missing report package(s): ", paste(missing, collapse = ", "))
+}
+
+root <- normalizePath(
+  file.path("..", "..", "02_analysis", "output", "data_description"),
+  mustWork = TRUE
+)
+read_table <- function(name) {
+  path <- file.path(root, "tables", name)
+  if (!file.exists(path)) stop("Required descriptive table missing: ", path)
+  readr::read_csv(path, show_col_types = FALSE)
+}
+show_table <- function(data, caption) {
+  DT::datatable(
+    data, caption = caption, rownames = FALSE, filter = "top",
+    options = list(pageLength = 10, scrollX = TRUE)
+  )
+}
+show_figure <- function(name) {
+  path <- file.path(root, "figures", name)
+  if (!file.exists(path)) stop("Required descriptive figure missing: ", path)
+  knitr::include_graphics(path)
+}
+
+overview <- read_table("dataset_overview.csv")
+groups <- read_table("group_distributions.csv")
+numeric_summaries <- read_table("numeric_summaries.csv")
+missing_values <- read_table("missing_values.csv")
+```
+
+# Overview
+
+The processed gender and growth dataset contains
+`r overview$samples[overview$dataset == "Gender and growth dataset"]` participants.
+The microbiome dataset contains
+`r overview$samples[overview$dataset == "Microbiome TSE dataset"]` samples.
+All microbiome sample identifiers were found in the gender and growth dataset.
+Gender was matched to the microbiome metadata by sample identifier for this
+description; the saved TSE object was not modified.
+
+```{r}
+show_table(overview, "Overview of the processed analysis datasets")
+```
+
+```{r}
+#| fig-cap: "Gender distribution in the full and microbiome datasets."
+show_figure("gender_distribution.png")
+```
+
+# Gender and growth dataset
+
+## Group distributions
+
+```{r}
+show_table(
+  dplyr::filter(groups, dataset == "Gender and growth dataset"),
+  "Group distributions: gender and growth dataset"
+)
+```
+
+## Numeric summaries
+
+```{r}
+show_table(
+  dplyr::filter(numeric_summaries, dataset == "Gender and growth dataset"),
+  "Numeric summaries: gender and growth dataset"
+)
+```
+
+## Growth distributions
+
+```{r}
+#| fig-cap: "Growth-variable distributions in the gender and growth dataset."
+show_figure("growth_distributions_gender_dataset.png")
+```
+
+## Growth correlations
+
+```{r}
+growth_correlations <- read_table("growth_correlations.csv")
+show_table(
+  dplyr::filter(
+    growth_correlations, dataset == "Gender and growth dataset"
+  ),
+  "Growth-variable correlations: gender and growth dataset"
+)
+```
+
+## Missing values
+
+```{r}
+show_table(
+  dplyr::filter(missing_values, dataset == "Gender and growth dataset"),
+  "Missing values: gender and growth dataset"
+)
+```
+
+# Microbiome TSE dataset
+
+## Sample and group distributions
+
+```{r}
+show_table(
+  dplyr::filter(groups, dataset == "Microbiome TSE dataset"),
+  "Group distributions: microbiome dataset"
+)
+```
+
+## Taxonomic levels
+
+```{r}
+show_table(
+  read_table("taxa_summary.csv"),
+  "Numbers of taxa and samples at each taxonomic level"
+)
+```
+
+## Numeric summaries
+
+```{r}
+show_table(
+  dplyr::filter(numeric_summaries, dataset == "Microbiome TSE dataset"),
+  "Numeric summaries: microbiome dataset"
+)
+```
+
+## Growth distributions and correlations
+
+```{r}
+#| fig-cap: "Growth-variable distributions among microbiome samples."
+show_figure("growth_distributions_tse_dataset.png")
+```
+
+```{r}
+show_table(
+  dplyr::filter(growth_correlations, dataset == "Microbiome TSE dataset"),
+  "Growth-variable correlations: microbiome dataset"
+)
+```
+
+## Hormones
+
+```{r}
+#| fig-cap: "Untransformed hormone distributions in the microbiome dataset."
+show_figure("hormone_distributions_tse_dataset.png")
+```
+
+```{r}
+show_table(
+  read_table("hormone_correlations.csv"),
+  "Hormone correlations: microbiome dataset"
+)
+```
+
+## Microbiome diversity
+
+```{r}
+#| fig-cap: "Distributions of the saved microbiome diversity measures."
+show_figure("diversity_distributions_tse_dataset.png")
+```
+
+## Missing values
+
+```{r}
+show_table(
+  dplyr::filter(missing_values, dataset == "Microbiome TSE dataset"),
+  "Missing values: microbiome dataset"
+)
+```
