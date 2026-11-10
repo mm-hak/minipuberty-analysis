@@ -55,7 +55,6 @@ quarto::quarto_render("reports/03_stage2_report.qmd")
 quarto::quarto_render("reports/04_stage3_species_report.qmd")
 quarto::quarto_render("reports/05_stage3_genus_report.qmd")
 quarto::quarto_render("reports/06_stage3_phylum_report.qmd")
-quarto::quarto_render("reports/07_summary_report.qmd")
 
 # Render all report pages as one multi-page website. (will take some time )
 quarto::quarto_render(input = ".", profile = "combined")
@@ -68,7 +67,7 @@ browseURL(normalizePath("output/reports/03_stage2_report.html"))
 browseURL(normalizePath("output/reports/04_stage3_species_report.html"))
 browseURL(normalizePath("output/reports/05_stage3_genus_report.html"))
 browseURL(normalizePath("output/reports/06_stage3_phylum_report.html"))
-browseURL(normalizePath("output/reports/07_summary_report.html"))
+
 
 browseURL(
   normalizePath(
