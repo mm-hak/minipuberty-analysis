@@ -1,0 +1,23 @@
+---
+title: "Minipuberty analysis report"
+format:
+  html:
+    toc: false
+---
+
+This multi-page report presents the saved results from the data-description,
+growth, hormone, and microbiome analyses. Use the navigation menu to move
+between the analysis stages.
+
+The report pages read the outputs produced by the analysis scripts. Rendering
+this report does not refit the statistical models.
+
+## Report contents
+
+- Description of the analysis datasets
+- Stage 1 gender-stratified growth analysis
+- Stage 1 growth analysis
+- Stage 2 hormone analysis
+- Stage 3 microbiome analyses at species, genus, and phylum levels
+
+
