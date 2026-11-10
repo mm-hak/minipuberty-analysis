@@ -1,0 +1,49 @@
+project:
+  type: website
+  output-dir: output/combined_report
+  render:
+    - index.qmd
+    - reports/00_data_description_report.qmd
+    - reports/01_stage1_gender_report.qmd
+    - reports/02_stage1_report.qmd
+    - reports/03_stage2_report.qmd
+    - reports/04_stage3_species_report.qmd
+    - reports/05_stage3_genus_report.qmd
+    - reports/06_stage3_phylum_report.qmd
+    - reports/07_summary_report.qmd
+
+website:
+  title: "Minipuberty analysis"
+  sidebar:
+    style: docked
+    search: true
+    contents:
+      - href: index.qmd
+        text: Home
+      - href: reports/00_data_description_report.qmd
+        text: Data description
+      - section: "Stage 1"
+        contents:
+          - href: reports/01_stage1_gender_report.qmd
+            text: Gender-stratified growth
+          - href: reports/02_stage1_report.qmd
+            text: Growth analysis
+      - href: reports/03_stage2_report.qmd
+        text: "Stage 2: Hormone analysis"
+      - section: "Stage 3: Microbiome analysis"
+        contents:
+          - href: reports/04_stage3_species_report.qmd
+            text: Species level
+          - href: reports/05_stage3_genus_report.qmd
+            text: Genus level
+          - href: reports/06_stage3_phylum_report.qmd
+            text: Phylum level
+      - href: reports/07_summary_report.qmd
+        text: Workflow summary
+
+format:
+  html:
+    toc: true
+    number-sections: true
+    theme: cosmo
+
